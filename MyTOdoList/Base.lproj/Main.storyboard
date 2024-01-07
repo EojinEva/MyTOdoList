@@ -42,10 +42,15 @@
                                 <action selector="addButton:" destination="BYZ-38-t0r" id="Y2b-48-chs"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Edit" id="LfO-S2-8kp"/>
+                        <barButtonItem key="rightBarButtonItem" title="Edit" id="LfO-S2-8kp">
+                            <connections>
+                                <action selector="tapedEditButton:" destination="BYZ-38-t0r" id="eYG-zp-JH5"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="addBarButton" destination="JhR-qD-Tms" id="oe7-eO-tZl"/>
+                        <outlet property="editButton" destination="LfO-S2-8kp" id="C2B-Ab-tyK"/>
                         <outlet property="listTableView" destination="KJs-J2-vhU" id="6ic-YB-U8S"/>
                     </connections>
                 </viewController>

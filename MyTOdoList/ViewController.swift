@@ -10,11 +10,18 @@ import CoreData
 
 class ViewController: UIViewController {
     
+    //할 일 목록 테이블 뷰
     @IBOutlet weak var listTableView: UITableView!
+    //할 일 추가 버튼
     @IBOutlet weak var addBarButton: UIBarButtonItem!
+    //편집 버튼
+    @IBOutlet weak var editButton: UIBarButtonItem!
     
-    var add: UIBarButtonItem?
-
+    //편집 완료 버튼
+    var doneButton: UIBarButtonItem?
+    
+    
+    //할 일 목록 저장하는 배열
     var tasks = [Task]() {
         didSet {
             self.saveTasks()
@@ -23,13 +30,32 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        //done버튼 구현
+        self.doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tapedDoneButton))
         self.listTableView.dataSource = self
         self.listTableView.delegate = self
+        //앱을 껐다 켜도 UserDefaults에 있는 할 일을 다시 불러와줌
         self.loadTasks()
-        view.addSubview(listTableView)
-        // Do any additional setup after loading the view.
     }
+    
+    //done 버튼 누르면
+    @objc func tapedDoneButton() {
+        self.navigationItem.rightBarButtonItem = self.editButton
+        //done 버튼을 누르면 edit모드 해제
+        self.listTableView.setEditing(false, animated: true)
+    }
+    
+    
+    @IBAction func tapedEditButton(_ sender: UIBarButtonItem) {
+        //tasks 배열이 비어있으면 편집모드가 뜨지 않음
+        guard !self.tasks.isEmpty else { return }
+        self.navigationItem.rightBarButtonItem = self.doneButton
+        //setEditing: 편집 모드 진입, 해제시 애니메이션을 보여줌
+        self.listTableView.setEditing(true, animated: true)
+    }
+    
+    
     //할 일 등록 버튼 액션
     @IBAction func addButton(_ sender: UIBarButtonItem) {
         //할 일 등록 버튼 누르면 뜨는 alert창
@@ -38,6 +64,7 @@ class ViewController: UIViewController {
         let add = UIAlertAction(title: "추가", style: .default, handler: { action in
             guard let title = alertController.textFields?[0].text else { return }
             let task = Task(title: title, done: false)
+            //추가 버튼을 누르면 tasks배열에 할 일 목록 추가됨
             self.tasks.append(task)
             self.listTableView.reloadData()
             
@@ -56,6 +83,7 @@ class ViewController: UIViewController {
         self.present(alertController, animated: true)
     }
     
+    //tasks 배열을 UserDefaults에 저장
     func saveTasks() {
         let data = self.tasks.map {
             [
@@ -63,10 +91,13 @@ class ViewController: UIViewController {
                 "done": $0.done
             ]
         }
+        //UserDefaults를 이용하기 위해 UserDefaults.standard를 호출
         let userDefaults = UserDefaults.standard
+        //값 저장
         userDefaults.set(data, forKey: "tasks")
     }
     
+    //UserDefaults에서 tasks배열을 불러오기
     func loadTasks() {
         let userDefaults = UserDefaults.standard
         guard let data = userDefaults.object(forKey: "tasks") as? [[String: Any]] else { return }
@@ -80,8 +111,7 @@ class ViewController: UIViewController {
     
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        var task = self.tasks[indexPath.row]
-        
+        let tasks = self.tasks[indexPath.row]
     }
 }
     
@@ -101,16 +131,17 @@ extension ViewController: UITableViewDataSource {
         } else {
             cell.accessoryType = .none
         }
-        
-        
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-//        self.tasks.remove(at: indexPath.row)
-//        listTableView.deleteRows(at: [indexPath], with: .automatic)
-//    }
     
-    
+    //tableView(_:commit:forRowAt:) 편집 모드 사용시 해당하는 할 일 삭제
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        self.tasks.remove(at: indexPath.row)
+        listTableView.deleteRows(at: [indexPath], with: .automatic)
+        if self.tasks.isEmpty {
+            self.tapedDoneButton()
+        }
+    }
 }
 
