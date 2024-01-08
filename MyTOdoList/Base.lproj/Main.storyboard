@@ -39,7 +39,7 @@
                     <navigationItem key="navigationItem" id="wml-oa-MOz">
                         <barButtonItem key="leftBarButtonItem" title="할 일 등록" id="JhR-qD-Tms">
                             <connections>
-                                <action selector="addButton:" destination="BYZ-38-t0r" id="Y2b-48-chs"/>
+                                <action selector="addButton:" destination="BYZ-38-t0r" id="1ol-DI-9iZ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Edit" id="LfO-S2-8kp">

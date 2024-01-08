@@ -4,9 +4,9 @@
 //
 //  Created by t2023-m0099 on 1/5/24.
 //
+//
 
 import UIKit
-import CoreData
 
 class ViewController: UIViewController {
     
@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     
     //편집 완료 버튼
     var doneButton: UIBarButtonItem?
+    var updateButton: UIBarButtonItem?
     
     
     //할 일 목록 저장하는 배열
@@ -32,6 +33,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         //done버튼 구현
+        //#selector = 메서드를 식별할 수 있는 고유 이름? struct타입이고 컴파일 타임에 지정
         self.doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tapedDoneButton))
         self.listTableView.dataSource = self
         self.listTableView.delegate = self
@@ -66,8 +68,8 @@ class ViewController: UIViewController {
             let task = Task(title: title, done: false)
             //추가 버튼을 누르면 tasks배열에 할 일 목록 추가됨
             self.tasks.append(task)
+            self.listTableView.setEditing(false, animated: true)
             self.listTableView.reloadData()
-            
             print("할 일 추가 완료")})
         //추가 취소 버튼
         let cancel = UIAlertAction(title: "취소", style: .cancel, handler: { action in
@@ -84,6 +86,7 @@ class ViewController: UIViewController {
     }
     
     //tasks 배열을 UserDefaults에 저장
+    //무지성 매핑 수정 필요
     func saveTasks() {
         let data = self.tasks.map {
             [
@@ -107,6 +110,13 @@ class ViewController: UIViewController {
             return Task(title: title, done: done)
         }
     }
+    
+    func deleteTasks() {
+        let userDefaults = UserDefaults.standard
+        userDefaults.removeObject(forKey: "tasks")
+    }
+    
+    
 }
     
 extension ViewController: UITableViewDelegate {
@@ -138,6 +148,12 @@ extension ViewController: UITableViewDataSource {
     //tableView(_:commit:forRowAt:) 편집 모드 사용시 해당하는 할 일 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         self.tasks.remove(at: indexPath.row)
+//        let userDefaults = UserDefaults.standard
+//        userDefaults.removeObject(forKey: "tasks")
+        
+        print(UserDefaults.standard.string(forKey: "tasks"))
+        print(UserDefaults.standard.bool(forKey: "tasks"))
+        
         listTableView.deleteRows(at: [indexPath], with: .automatic)
         if self.tasks.isEmpty {
             self.tapedDoneButton()
