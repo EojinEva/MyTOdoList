@@ -11,9 +11,6 @@ import Foundation
 
 class ViewController: UIViewController {
     
-    
-    
-    
     //할 일 목록 테이블 뷰
     @IBOutlet weak var listTableView: UITableView!
     //할 일 추가 버튼
@@ -34,6 +31,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.listTableView.register(TodoListHeader.self, forHeaderFooterViewReuseIdentifier: TodoListHeader.identi)
+        
         //done버튼 구현
         //#selector = 메서드를 식별할 수 있는 고유 이름? struct타입이고 컴파일 타임에 지정
         self.doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tapedDoneButton))
@@ -43,6 +42,9 @@ class ViewController: UIViewController {
         
         //self.saveList()
         //앱을 껐다 켜도 UserDefaults에 있는 할 일을 다시 불러와줌
+
+            
+        
         self.loadList()
         
     }
@@ -94,6 +96,8 @@ class ViewController: UIViewController {
             } else {
                 self.tasks.append(TodoList(date: date, list: [data]))
             }
+            
+            self.listTableView.setEditing(false, animated: true)
             self.listTableView.reloadData()
         })
         
@@ -131,10 +135,22 @@ extension ViewController: UITableViewDataSource {
         return tasks.count
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: TodoListHeader.identi) as? TodoListHeader else {
+            return UIView()
+        }
+        headerView.setDate(model: tasks[section].date)
+        return headerView
+    }
+    
     //header이름
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        
-        return "헤더"
+        let headerName = tasks[section].date
+        return "\(headerName)"
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40 // 원하는 헤더 높이로 수정하세요.
     }
     
     
@@ -161,23 +177,21 @@ extension ViewController: UITableViewDataSource {
         let userDefaults = UserDefaults.standard
         userDefaults.removeObject(forKey: "tasks")
         
-        tableView.deleteRows(at: [indexPath], with: .automatic)
-        
-        print(UserDefaults.standard.string(forKey: "tasks"))
-        print(UserDefaults.standard.bool(forKey: "tasks"))
+        tableView.deleteRows(at: [indexPath], with: .fade)
         
         //헤더 삭제, 섹션 삭제
         
         if tasks[indexPath.section].list.isEmpty {
             tasks.remove(at: indexPath.section)
-            tableView.deleteSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+            tableView.deleteSections(IndexSet(arrayLiteral: indexPath.section), with: .fade)
         }
-        
-        
         
         if self.tasks.isEmpty {
             self.tapedDoneButton()
         }
+        
+        print(UserDefaults.standard.string(forKey: "tasks"))
+        print(UserDefaults.standard.bool(forKey: "tasks"))
     }
 }
 

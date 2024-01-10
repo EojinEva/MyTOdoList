@@ -9,7 +9,7 @@ import Foundation
 
 class TodoListManager {
     static let shared = TodoListManager()
-    private let todoListKey = "myKey"
+    private let todoListKey = "myKey2"
     private init() {}
     
     

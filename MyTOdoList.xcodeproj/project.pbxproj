@@ -17,6 +17,7 @@
 		6B5F41022B483E6F00CFB4AC /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5F41012B483E6F00CFB4AC /* Task.swift */; };
 		6B5F41042B4C309C00CFB4AC /* FirstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5F41032B4C309C00CFB4AC /* FirstView.swift */; };
 		6B5F41082B4D7D0D00CFB4AC /* TodoListManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5F41072B4D7D0D00CFB4AC /* TodoListManager.swift */; };
+		6B5F410A2B4ECCC000CFB4AC /* TodoListHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B5F41092B4ECCC000CFB4AC /* TodoListHeader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		6B5F41012B483E6F00CFB4AC /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		6B5F41032B4C309C00CFB4AC /* FirstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstView.swift; sourceTree = "<group>"; };
 		6B5F41072B4D7D0D00CFB4AC /* TodoListManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListManager.swift; sourceTree = "<group>"; };
+		6B5F41092B4ECCC000CFB4AC /* TodoListHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListHeader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,9 +68,10 @@
 			children = (
 				6B5F40E42B47C8F400CFB4AC /* AppDelegate.swift */,
 				6B5F40E62B47C8F400CFB4AC /* SceneDelegate.swift */,
+				6B5F40E82B47C8F400CFB4AC /* ViewController.swift */,
+				6B5F41092B4ECCC000CFB4AC /* TodoListHeader.swift */,
 				6B5F41012B483E6F00CFB4AC /* Task.swift */,
 				6B5F41072B4D7D0D00CFB4AC /* TodoListManager.swift */,
-				6B5F40E82B47C8F400CFB4AC /* ViewController.swift */,
 				6B5F40FD2B482D9900CFB4AC /* ListTableViewCell.swift */,
 				6B5F41032B4C309C00CFB4AC /* FirstView.swift */,
 				6B5F40EA2B47C8F400CFB4AC /* Main.storyboard */,
@@ -152,6 +155,7 @@
 			files = (
 				6B5F40E92B47C8F400CFB4AC /* ViewController.swift in Sources */,
 				6B5F41042B4C309C00CFB4AC /* FirstView.swift in Sources */,
+				6B5F410A2B4ECCC000CFB4AC /* TodoListHeader.swift in Sources */,
 				6B5F40FE2B482D9900CFB4AC /* ListTableViewCell.swift in Sources */,
 				6B5F40E52B47C8F400CFB4AC /* AppDelegate.swift in Sources */,
 				6B5F40E72B47C8F400CFB4AC /* SceneDelegate.swift in Sources */,
