@@ -11,6 +11,9 @@ import UIKit
 class ListTableViewCell: UITableViewCell {
 
     
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -18,8 +21,11 @@ class ListTableViewCell: UITableViewCell {
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
     }
+}
 
+extension ListTableViewCell {
+    func setTodoList(_ model : TodoListContent) {
+        titleLabel.text = model.title
+    }
 }

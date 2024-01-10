@@ -7,8 +7,12 @@
 //
 
 import UIKit
+import Foundation
 
 class ViewController: UIViewController {
+    
+    
+    
     
     //할 일 목록 테이블 뷰
     @IBOutlet weak var listTableView: UITableView!
@@ -19,13 +23,11 @@ class ViewController: UIViewController {
     
     //편집 완료 버튼
     var doneButton: UIBarButtonItem?
-    var updateButton: UIBarButtonItem?
-    
     
     //할 일 목록 저장하는 배열
-    var tasks = [Task]() {
+    var tasks = [TodoList]() {
         didSet {
-            self.saveTasks()
+            self.saveList()
         }
     }
     
@@ -35,11 +37,21 @@ class ViewController: UIViewController {
         //done버튼 구현
         //#selector = 메서드를 식별할 수 있는 고유 이름? struct타입이고 컴파일 타임에 지정
         self.doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tapedDoneButton))
+        
         self.listTableView.dataSource = self
         self.listTableView.delegate = self
+        
+        //self.saveList()
         //앱을 껐다 켜도 UserDefaults에 있는 할 일을 다시 불러와줌
-        self.loadTasks()
+        self.loadList()
+        
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.saveList() // ***** View가 사라지기전 한번더 저장 열받는다 원래는 뷰디드로드에 해도 됐는데 왜지?? *****
+    }
+    
+    
     
     //done 버튼 누르면
     @objc func tapedDoneButton() {
@@ -60,104 +72,123 @@ class ViewController: UIViewController {
     
     //할 일 등록 버튼 액션
     @IBAction func addButton(_ sender: UIBarButtonItem) {
+        
         //할 일 등록 버튼 누르면 뜨는 alert창
         let alertController = UIAlertController(title: "할 일 추가", message: nil, preferredStyle: .alert)
-        //추가 버튼
-        let add = UIAlertAction(title: "추가", style: .default, handler: { action in
-            guard let title = alertController.textFields?[0].text else { return }
-            let task = Task(title: title, done: false)
-            //추가 버튼을 누르면 tasks배열에 할 일 목록 추가됨
-            self.tasks.append(task)
-            self.listTableView.setEditing(false, animated: true)
-            self.listTableView.reloadData()
-            print("할 일 추가 완료")})
+        
         //추가 취소 버튼
         let cancel = UIAlertAction(title: "취소", style: .cancel, handler: { action in
-            print("할 일 등록 취소")})
+            print("등록 취소")
+        })
+        
+        //추가 버튼
+        let add = UIAlertAction(title: "추가", style: .default, handler: { _ in
+            
+            guard let date = alertController.textFields?[0].text else { return } // 날짜 입력
+            guard let title = alertController.textFields?[1].text else { return } // 할 일 입력
+            
+            let data = TodoListContent(title: title, done: true)
+            
+            if let index = self.tasks.firstIndex(where: {$0.date == date}) {
+                self.tasks[index].list.append(data)
+            } else {
+                self.tasks.append(TodoList(date: date, list: [data]))
+            }
+            self.listTableView.reloadData()
+        })
         
         
         //alert 내의 텍스트 필드 추가
-        alertController.addTextField { textField in
-            textField.placeholder = "To Do List"
+        alertController.addTextField { date in
+            date.placeholder = "ex - 24.01.01"
+        }
+        alertController.addTextField { title in
+            title.placeholder = "할 일을 입력하세요."
         }
         alertController.addAction(add)
         alertController.addAction(cancel)
         self.present(alertController, animated: true)
     }
-    
-    //tasks 배열을 UserDefaults에 저장
-    //무지성 매핑 수정 필요
-    func saveTasks() {
-        let data = self.tasks.map {
-            [
-                "title": $0.title,
-                "done": $0.done
-            ]
-        }
-        //UserDefaults를 이용하기 위해 UserDefaults.standard를 호출
-        let userDefaults = UserDefaults.standard
-        //값 저장
-        userDefaults.set(data, forKey: "tasks")
-    }
-    
-    //UserDefaults에서 tasks배열을 불러오기
-    func loadTasks() {
-        let userDefaults = UserDefaults.standard
-        guard let data = userDefaults.object(forKey: "tasks") as? [[String: Any]] else { return }
-        self.tasks = data.compactMap{
-            guard let title = $0["title"] as? String else { return nil }
-            guard let done = $0["done"] as? Bool else { return nil }
-            return Task(title: title, done: done)
-        }
-    }
-    
-    func deleteTasks() {
-        let userDefaults = UserDefaults.standard
-        userDefaults.removeObject(forKey: "tasks")
-    }
-    
-    
 }
-    
+
+
+
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         let tasks = self.tasks[indexPath.row]
     }
 }
-    
+
 
 extension ViewController: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.tasks.count
+        return tasks[section].list.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = listTableView.dequeueReusableCell(withIdentifier: "listTableViewCell", for: indexPath)
-        let task = self.tasks[indexPath.row]
-        cell.textLabel?.text = task.title
+    //셀 개수
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return tasks.count
+    }
+    
+    //header이름
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
-        if task.done {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        return "헤더"
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        //다운캐스팅 공부 좀 더 해보기
+        guard let cell = listTableView.dequeueReusableCell(withIdentifier: "listTableViewCell", for: indexPath) as? ListTableViewCell else { return UITableViewCell()}
+        cell.setTodoList(tasks[indexPath.section].list[indexPath.row])
+        
+        /*
+         //섹션에 따라 셀 만들기
+         if indexPath.section == 0 {
+         } else if indexPath.section == 1 {
+         } else {
+         }
+         */
+        
         return cell
     }
     
-    
     //tableView(_:commit:forRowAt:) 편집 모드 사용시 해당하는 할 일 삭제
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        self.tasks.remove(at: indexPath.row)
-//        let userDefaults = UserDefaults.standard
-//        userDefaults.removeObject(forKey: "tasks")
+        
+        tasks[indexPath.section].list.remove(at: indexPath.row)
+        let userDefaults = UserDefaults.standard
+        userDefaults.removeObject(forKey: "tasks")
+        
+        tableView.deleteRows(at: [indexPath], with: .automatic)
         
         print(UserDefaults.standard.string(forKey: "tasks"))
         print(UserDefaults.standard.bool(forKey: "tasks"))
         
-        listTableView.deleteRows(at: [indexPath], with: .automatic)
+        //헤더 삭제, 섹션 삭제
+        
+        if tasks[indexPath.section].list.isEmpty {
+            tasks.remove(at: indexPath.section)
+            tableView.deleteSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+        }
+        
+        
+        
         if self.tasks.isEmpty {
             self.tapedDoneButton()
         }
     }
 }
+
+
+
+
+/*
+ 해결할것
+ 1. 할 일 1개 등록시 section 두 개에 모두 들어가버림 - section별로 text를 적용할 수 있게 해야하나? cell을 나눠서 데이터를 담아야하나?
+ 2. header footer 크기가 이상함... 왜 잘리지?
+ 3. section 적용 후 삭제가 안 됨 하하 encode decode를 알아보자
+ */
+
 

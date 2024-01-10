@@ -6,8 +6,15 @@
 //
 
 import Foundation
+import UIKit
 
-struct Task {
+
+struct TodoList: Codable {
+    var date: String
+    var list: [TodoListContent]
+}
+
+struct TodoListContent: Codable {
     var title: String
     var done: Bool
 }
