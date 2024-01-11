@@ -4,7 +4,7 @@
 //
 //  Created by t2023-m0099 on 1/5/24.
 //
-//
+// 제출
 
 import UIKit
 import Foundation
@@ -39,23 +39,16 @@ class ViewController: UIViewController {
         
         self.listTableView.dataSource = self
         self.listTableView.delegate = self
-        
-        //self.saveList()
-        //앱을 껐다 켜도 UserDefaults에 있는 할 일을 다시 불러와줌
-
-            
-        
         self.loadList()
         
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.saveList() // ***** View가 사라지기전 한번더 저장 열받는다 원래는 뷰디드로드에 해도 됐는데 왜지?? *****
+        //앱을 껐다 켜도 UserDefaults에 있는 할 일을 다시 불러와줌
+        //View가 사라지기전 한번더 저장
+        self.saveList()
     }
     
-    
-    
-    //done 버튼 누르면
     @objc func tapedDoneButton() {
         self.navigationItem.rightBarButtonItem = self.editButton
         //done 버튼을 누르면 edit모드 해제
@@ -88,9 +81,7 @@ class ViewController: UIViewController {
             
             guard let date = alertController.textFields?[0].text else { return } // 날짜 입력
             guard let title = alertController.textFields?[1].text else { return } // 할 일 입력
-            
             let data = TodoListContent(title: title, done: true)
-            
             if let index = self.tasks.firstIndex(where: {$0.date == date}) {
                 self.tasks[index].list.append(data)
             } else {
@@ -100,8 +91,7 @@ class ViewController: UIViewController {
             self.listTableView.setEditing(false, animated: true)
             self.listTableView.reloadData()
         })
-        
-        
+                
         //alert 내의 텍스트 필드 추가
         alertController.addTextField { date in
             date.placeholder = "ex - 24.01.01"
@@ -123,7 +113,6 @@ extension ViewController: UITableViewDelegate {
     }
 }
 
-
 extension ViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -135,13 +124,22 @@ extension ViewController: UITableViewDataSource {
         return tasks.count
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: TodoListHeader.identi) as? TodoListHeader else {
-            return UIView()
-        }
-        headerView.setDate(model: tasks[section].date)
-        return headerView
-    }
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: TodoListHeader.identi) as? TodoListHeader else {
+//            return UIView()
+//        }
+//        headerView.setDate(model: tasks[section].date)
+//        return headerView
+//    }
+    
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        let view = UIView(frame: CGRect(x: 0, y: -20, width: tableView.frame.width, height: 40))
+//        let textLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 20))
+//        textLabel.text = tasks[section].date
+//        textLabel.textColor = UIColor.lightGray
+//        view.addSubview(textLabel)
+//        return view
+//    }
     
     //header이름
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -150,7 +148,7 @@ extension ViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40 // 원하는 헤더 높이로 수정하세요.
+        return 35 // 원하는 헤더 높이로 수정하세요.
     }
     
     
@@ -158,15 +156,6 @@ extension ViewController: UITableViewDataSource {
         //다운캐스팅 공부 좀 더 해보기
         guard let cell = listTableView.dequeueReusableCell(withIdentifier: "listTableViewCell", for: indexPath) as? ListTableViewCell else { return UITableViewCell()}
         cell.setTodoList(tasks[indexPath.section].list[indexPath.row])
-        
-        /*
-         //섹션에 따라 셀 만들기
-         if indexPath.section == 0 {
-         } else if indexPath.section == 1 {
-         } else {
-         }
-         */
-        
         return cell
     }
     
@@ -177,10 +166,8 @@ extension ViewController: UITableViewDataSource {
         let userDefaults = UserDefaults.standard
         userDefaults.removeObject(forKey: "tasks")
         
-        tableView.deleteRows(at: [indexPath], with: .fade)
-        
         //헤더 삭제, 섹션 삭제
-        
+        tableView.deleteRows(at: [indexPath], with: .fade)
         if tasks[indexPath.section].list.isEmpty {
             tasks.remove(at: indexPath.section)
             tableView.deleteSections(IndexSet(arrayLiteral: indexPath.section), with: .fade)
@@ -194,15 +181,4 @@ extension ViewController: UITableViewDataSource {
         print(UserDefaults.standard.bool(forKey: "tasks"))
     }
 }
-
-
-
-
-/*
- 해결할것
- 1. 할 일 1개 등록시 section 두 개에 모두 들어가버림 - section별로 text를 적용할 수 있게 해야하나? cell을 나눠서 데이터를 담아야하나?
- 2. header footer 크기가 이상함... 왜 잘리지?
- 3. section 적용 후 삭제가 안 됨 하하 encode decode를 알아보자
- */
-
 
